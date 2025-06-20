@@ -19,7 +19,8 @@ public interface RequestViewRepository extends Repository<RequestView, Long> {
           AND (:to         IS NULL OR rv.timestamp <= :to)
           AND (:minHeaders IS NULL OR rv.avgHeaders >= :minHeaders)
           AND (:minParams  IS NULL OR rv.avgParams  >= :minParams)
-    """)
+    """
+    )
     Page<RequestView> findFiltered(
             @Param("host")       String host,
             @Param("path")       String path,
