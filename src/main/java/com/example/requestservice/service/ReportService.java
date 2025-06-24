@@ -24,17 +24,22 @@ import java.util.Optional;
 public class ReportService {
 
     private final ReportRepository reportRepo;
-    private final RequestViewRepository viewRepo;
+    private final RequestViewService viewService;
     private final String reportsDir;
 
-    public ReportService(ReportRepository reportRepo,
-                         RequestViewRepository viewRepo,
-                         @Value("${reports.dir:src/main/resources/reports}") String reportsDir) {
+    public ReportService(
+            ReportRepository reportRepo,
+            RequestViewService viewService,
+            @Value("${reports.dir:src/main/resources/reports}") String reportsDir
+    ) {
         this.reportRepo = reportRepo;
-        this.viewRepo = viewRepo;
+        this.viewService = viewService;
         this.reportsDir = reportsDir;
+
         File dir = new File(reportsDir);
-        if (!dir.exists()) dir.mkdirs();
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
     }
 
     public Long createReport(ReportRequestDTO dto) {
@@ -47,24 +52,43 @@ public class ReportService {
         r.setMinParams(dto.getMinParams());
         r.setDone(false);
         r.setCreatedAt(LocalDateTime.now());
+
         r = reportRepo.save(r);
+        System.out.println("Creating report with filters: host=" + dto.getHost() + ", path=" + dto.getPath() +
+                ", start=" + dto.getStartDate() + ", end=" + dto.getEndDate() +
+                ", minHeaders=" + dto.getMinHeaders() + ", minParams=" + dto.getMinParams());
+
         generateReportAsync(r);
+
         return r.getId();
     }
 
     @Async
     public void generateReportAsync(Report report) {
-        List<RequestView> data = viewRepo.findFiltered(
-                report.getHost(), report.getPath(), report.getStartDate(), report.getEndDate(),
-                report.getMinHeaders(), report.getMinParams(), PageRequest.of(0, Integer.MAX_VALUE)
-        ).getContent();
-
-        String csv = reportsDir + File.separator + "report_" + report.getId() + ".csv";
         try {
+
+
+
+            List<RequestView> data = viewService.getFiltered(
+                    report.getHost(),
+                    report.getPath(),
+                    report.getStartDate(),
+                    report.getEndDate(),
+                    report.getMinHeaders(),
+                    report.getMinParams(),
+                    0,
+                    Integer.MAX_VALUE
+            ).getContent();
+
+            String csv = reportsDir + File.separator + "report_" + report.getId() + ".csv";
             CsvUtil.writeCsv(csv, data);
+
             report.setCsvPath(csv);
             report.setDone(true);
             reportRepo.save(report);
+
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,14 +100,23 @@ public class ReportService {
 
     public Page<RequestView> getPagedData(Long id, PageRequest pr) {
         Report r = reportRepo.findById(id).orElseThrow();
-        return viewRepo.findFiltered(
-                r.getHost(), r.getPath(), r.getStartDate(), r.getEndDate(), r.getMinHeaders(), r.getMinParams(), pr
+        return viewService.getFiltered(
+                r.getHost(),
+                r.getPath(),
+                r.getStartDate(),
+                r.getEndDate(),
+                r.getMinHeaders(),
+                r.getMinParams(),
+                pr.getPageNumber(),
+                pr.getPageSize()
         );
     }
 
     public Resource getCsvResource(Long id) {
         Optional<Report> opt = reportRepo.findById(id);
-        if (opt.isEmpty() || opt.get().getCsvPath() == null) return null;
+        if (opt.isEmpty() || opt.get().getCsvPath() == null) {
+            return null;
+        }
         return new FileSystemResource(opt.get().getCsvPath());
     }
 }
