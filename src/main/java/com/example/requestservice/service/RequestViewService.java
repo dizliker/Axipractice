@@ -2,11 +2,10 @@ package com.example.requestservice.service;
 
 import com.example.requestservice.model.RequestView;
 import com.example.requestservice.repo.RequestViewRepository;
-import com.example.requestservice.spec.RequestViewSpecifications;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 public class RequestViewService {
@@ -20,19 +19,22 @@ public class RequestViewService {
     public Page<RequestView> getFiltered(
             String host,
             String path,
-            LocalDateTime from,
-            LocalDateTime to,
-            Integer minHeaders,
-            Integer minParams,
-            int page,
-            int size
+            Pageable pageable,
+            Specification<RequestView> spec
     ) {
+        Specification<RequestView> baseSpec = Specification.where(null);
 
-            Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-            var spec = RequestViewSpecifications.filtered(host, path, from, to, minHeaders, minParams);
+        if (host != null && !host.isEmpty()) {
+            baseSpec = baseSpec.and((root, query, cb) -> cb.equal(root.get("host"), host));
+        }
+        if (path != null && !path.isEmpty()) {
+            baseSpec = baseSpec.and((root, query, cb) -> cb.equal(root.get("path"), path));
+        }
 
-            return repo.findAll(spec, pageable);
+        if (spec != null) {
+            baseSpec = baseSpec.and(spec);
+        }
 
-
+        return repo.findAll(baseSpec, pageable);
     }
 }
