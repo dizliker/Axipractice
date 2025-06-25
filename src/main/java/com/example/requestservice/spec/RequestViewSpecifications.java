@@ -1,7 +1,6 @@
 package com.example.requestservice.spec;
 
 import com.example.requestservice.model.RequestView;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
@@ -17,33 +16,27 @@ public class RequestViewSpecifications {
             Integer minParams
     ) {
         return (root, query, cb) -> {
-            Predicate predicate = cb.conjunction();
+            var predicates = cb.conjunction();
 
             if (host != null && !host.isEmpty()) {
-                predicate = cb.and(predicate, cb.equal(root.get("host"), host));
+                predicates = cb.and(predicates, cb.equal(root.get("host"), host));
             }
-
             if (path != null && !path.isEmpty()) {
-                predicate = cb.and(predicate, cb.equal(root.get("path"), path));
+                predicates = cb.and(predicates, cb.equal(root.get("path"), path));
             }
-
             if (from != null) {
-                predicate = cb.and(predicate, cb.greaterThanOrEqualTo(root.get("timestamp"), from));
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("timestamp"), from));
             }
-
             if (to != null) {
-                predicate = cb.and(predicate, cb.lessThanOrEqualTo(root.get("timestamp"), to));
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("timestamp"), to));
             }
-
             if (minHeaders != null) {
-                predicate = cb.and(predicate, cb.greaterThanOrEqualTo(root.get("avgHeaders"), minHeaders));
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("avgHeaders"), minHeaders.doubleValue()));
             }
-
             if (minParams != null) {
-                predicate = cb.and(predicate, cb.greaterThanOrEqualTo(root.get("avgParams"), minParams));
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("avgParams"), minParams.doubleValue()));
             }
-
-            return predicate;
+            return predicates;
         };
     }
 }

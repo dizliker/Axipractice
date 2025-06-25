@@ -2,6 +2,7 @@ package com.example.requestservice.controller;
 
 import com.example.requestservice.dto.ReportCreationResponseDTO;
 import com.example.requestservice.dto.ReportRequestDTO;
+import com.example.requestservice.dto.ReportStatusDTO;
 import com.example.requestservice.model.Report;
 import com.example.requestservice.model.RequestView;
 import com.example.requestservice.service.ReportService;
@@ -58,4 +59,18 @@ public class ReportController {
                 .contentType(MediaType.parseMediaType("text/csv"))
                 .body(res);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ReportStatusDTO> getStatus(@PathVariable Long id) {
+        return reportService.getById(id)
+                .map(report -> ResponseEntity.ok(new ReportStatusDTO(
+                        report.getId(),
+                        report.isDone(),
+                        report.getErrorMessage()
+                )))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
+
 }

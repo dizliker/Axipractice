@@ -14,15 +14,16 @@ public class RequestView {
     private Long id;
 
     private String host;
+
     private String path;
 
     private LocalDateTime timestamp;
 
     @Column(name = "avg_headers")
-    private Integer avgHeaders;
+    private Double avgHeaders;  // изменено на Double
 
     @Column(name = "avg_params")
-    private Integer avgParams;
+    private Double avgParams;   // изменено на Double
 
     public Long getId() {
         return id;
@@ -40,11 +41,11 @@ public class RequestView {
         return timestamp;
     }
 
-    public Integer getAvgHeaders() {
+    public Double getAvgHeaders() {
         return avgHeaders;
     }
 
-    public Integer getAvgParams() {
+    public Double getAvgParams() {
         return avgParams;
     }
 }

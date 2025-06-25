@@ -1,0 +1,5 @@
+id,host,path,timestamp,avgHeaders,avgParams
+4,https://axiomatikallc.visualstudio.com,/Practice_20230120/_workitems/create/Task,2025-06-18T15:08:22.400379,0,0
+3,https://axiomatikallc.visualstudio.com,/Practice_20230120/_workitems/create/Task,2025-06-18T15:08:21.559186,0,0
+2,https://axiomatikallc.visualstudio.com,/Practice_20230120/_workitems/create/Task,2025-06-18T15:08:17.850660,0,0
+1,https://axiomatikallc.visualstudio.com,Practice_20230120/_workitems/create/Task,2025-06-18T15:08:06.313182,2,2

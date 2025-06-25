@@ -28,12 +28,24 @@ public class Report {
 
     private boolean done = false;
 
+
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "csv_path")
     private String csvPath;
 
+    @Column(length = 1000)
+    private String errorMessage;
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
     // Геттеры и сеттеры
     public Long getId() { return id; }
 
