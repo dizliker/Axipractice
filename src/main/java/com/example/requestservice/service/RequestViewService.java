@@ -2,6 +2,7 @@ package com.example.requestservice.service;
 
 import com.example.requestservice.model.RequestView;
 import com.example.requestservice.repo.RequestViewRepository;
+import com.example.requestservice.spec.RequestViewSpecifications;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,12 @@ public class RequestViewService {
             int page,
             int size
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        return repo.findFiltered(host, path, from, to, minHeaders, minParams, pageable);
+
+            Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+            var spec = RequestViewSpecifications.filtered(host, path, from, to, minHeaders, minParams);
+
+            return repo.findAll(spec, pageable);
+
+
     }
 }

@@ -1,5 +1,6 @@
 package com.example.requestservice.controller;
 
+import com.example.requestservice.dto.ReportCreationResponseDTO;
 import com.example.requestservice.dto.ReportRequestDTO;
 import com.example.requestservice.model.Report;
 import com.example.requestservice.model.RequestView;
@@ -27,9 +28,10 @@ public class ReportController {
 
     // Создание отчёта
     @PostMapping
-    public Map<String, Object> create(@RequestBody ReportRequestDTO dto) {
+    public ResponseEntity<ReportCreationResponseDTO> create(@RequestBody ReportRequestDTO dto) {
         Long id = reportService.createReport(dto);
-        return Map.of("reportId", id, "message", "Report creation started");
+        ReportCreationResponseDTO response = new ReportCreationResponseDTO(id, "Report creation started");
+        return ResponseEntity.ok(response);
     }
 
     // Список отчётов
